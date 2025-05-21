@@ -1,12 +1,6 @@
 # faireez-Assignment
 Contacts Application Assignment
 
-A full-stack contacts manager built with **React** and **NestJS**. Users can view, search, favorite, and simulate calling contacts via a clean and responsive interface.
-
----
-
-## 🚀 Project Overview
-
 This application allows users to manage their contacts efficiently with a modern and intuitive UI. It fetches contacts from the [RandomUser API](https://randomuser.me/), supports filtering, viewing contact details in a modal, and toggling favorites. It also includes proper error handling and loading states throughout the app.
 
 ---
