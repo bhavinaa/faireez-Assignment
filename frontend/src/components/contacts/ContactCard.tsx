@@ -1,4 +1,4 @@
-import { Phone, Heart, Star } from 'lucide-react';
+import { Phone, Heart, Star, Mail } from 'lucide-react';
 
 export interface Contact {
   id: string;
@@ -15,51 +15,49 @@ interface ContactCardProps {
   onToggleFavorite: (id: string) => void;
 }
 
-export const ContactCard = ({ contact, onClick, onToggleFavorite }: ContactCardProps) => (
-  <div 
-    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-6 cursor-pointer border border-gray-100 hover:border-blue-200 group"
-    onClick={() => onClick(contact)}
-  >
-    <div className="flex items-center space-x-4">
-      <div className="relative">
-        <img 
-          src={contact.picture} 
-          alt={`${contact.name}`}
-          className="w-16 h-16 rounded-full object-cover ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300"
+const ContactCard = ({ contact, onClick, onToggleFavorite }: ContactCardProps) => (
+  <div className=
+  "bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 cursor-pointer">
+    <div onClick={() => onClick(contact)}>
+      <div className="flex items-center space-x-4 mb-4">
+        <img
+          src={contact.picture}
+          alt={contact.name}
+          className="w-12 h-12 rounded-full object-cover"
         />
-        {contact.isFavorite && (
-          <div className="absolute -top-1 -right-1 bg-yellow-400 rounded-full p-1">
-            <Star className="w-3 h-3 text-white fill-current" />
-          </div>
-        )}
+        <div className="flex-1 min-w-0">
+          <h3 className="text-lg font-semibold text-gray-900 truncate">{contact.name}</h3>
+          <p className="text-sm text-gray-500 truncate">{contact.email}</p>
+        </div>
       </div>
-      
-      <div className="flex-1 min-w-0">
-        <h3 className="text-lg font-semibold text-gray-900 truncate">
-          {contact.name} 
-        </h3>
-        <p className="text-sm text-gray-600 truncate">{contact.phone}</p>
-        <p className="text-sm text-gray-500 truncate">{contact.email}</p>
+      <div className="space-y-2">
+        <div className="flex items-center text-sm text-gray-600">
+          <Mail className="w-4 h-4 mr-2" />
+          <span className="truncate">{contact.email}</span>
+        </div>
+        <div className="flex items-center text-sm text-gray-600">
+          <Phone className="w-4 h-4 mr-2" />
+          <span>{contact.phone}</span>
+        </div>
       </div>
-      
-      <div className="flex flex-col items-end space-y-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite(contact.id);
-          }}
-          className={`p-2 rounded-full transition-all duration-200 ${
-            contact.isFavorite 
-              ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200' 
-              : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-600'
-          }`}
-        >
-          <Heart className={`w-4 h-4 ${contact.isFavorite ? 'fill-current' : ''}`} />
-        </button>
-        <button className="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 transition-all duration-200">
-          <Phone className="w-4 h-4" />
-        </button>
-      </div>
+    </div>
+    <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite(contact.id);
+        }}
+        className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm transition-colors ${
+          contact.isFavorite
+            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+            : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+        }`}
+      >
+        <Heart className={`w-4 h-4 ${contact.isFavorite ? 'fill-current' : ''}`} />
+        <span>{contact.isFavorite ? 'Favorited' : 'Favorite'}</span>
+      </button>
     </div>
   </div>
 );
+export default ContactCard;
+

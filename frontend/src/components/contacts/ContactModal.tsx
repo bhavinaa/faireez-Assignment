@@ -17,6 +17,7 @@ interface ContactModalProps {
   onToggleFavorite: (id: string) => void;
 }
 
+
 export const ContactModal = ({ contact, isOpen, onClose, onCall, onToggleFavorite }: ContactModalProps) => {
   if (!isOpen || !contact) return null;
 
