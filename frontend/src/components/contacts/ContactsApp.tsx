@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, User, Star } from 'lucide-react';
 import ContactCard from './ContactCard';
-import {ContactModal} from './ContactModal';  
-import { generateFakeContacts } from '../../data'; 
+import { ContactModal } from './ContactModal';
+import { generateFakeContacts } from '../../data';
 
 export interface Contact {
   id: string;
@@ -30,17 +30,21 @@ const ContactsApp = () => {
       try {
         setLoading(true);
         // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const fakeContacts = generateFakeContacts();
-        const transformedContacts = fakeContacts.map(contact => ({
-          id: String(contact.id),
-          name: `${contact.firstName} ${contact.lastName}`,
-          email: contact.email,
-          phone: contact.phone,
-          picture: contact.avatar,
-          isFavorite: contact.isFavorite
-        }));
-        setContacts(transformedContacts);
+        /*  await new Promise(resolve => setTimeout(resolve, 1000));
+          const fakeContacts = generateFakeContacts();
+          const transformedContacts = fakeContacts.map(contact => ({
+            id: String(contact.id),
+            name: `${contact.firstName} ${contact.lastName}`,
+            email: contact.email,
+            phone: contact.phone,
+            picture: contact.avatar,
+            isFavorite: contact.isFavorite
+          }));
+          setContacts(transformedContacts); */
+        const response = await fetch('http://localhost:3000/contacts');
+        const data = await response.json();
+        setContacts(data);
+
         setError(null);
       } catch (err) {
         setError('Failed to load contacts. Please try again.');
@@ -94,8 +98,8 @@ const ContactsApp = () => {
   };
 
   const handleToggleFavorite = (contactId: string): void => {
-    setContacts(prev => prev.map(contact => 
-      contact.id === contactId 
+    setContacts(prev => prev.map(contact =>
+      contact.id === contactId
         ? { ...contact, isFavorite: !contact.isFavorite }
         : contact
     ));
@@ -110,8 +114,8 @@ const ContactsApp = () => {
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
           <p className="text-gray-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Try Again
@@ -164,7 +168,7 @@ const ContactsApp = () => {
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 mb-6 sm:mb-8">
+        <div className="bg-white text-black rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100 mb-6 sm:mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -179,28 +183,27 @@ const ContactsApp = () => {
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-3">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                className="px-4 py-3  text-black  border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               >
                 <option value="name">Sort by Name</option>
                 <option value="email">Sort by Email</option>
                 <option value="phone">Sort by Phone</option>
               </select>
-              
+
               <button
                 onClick={() => {
                   setFilterFavorites(!filterFavorites);
                   setCurrentPage(1);
                 }}
-                className={`px-4 py-3 rounded-lg font-medium transition-colors duration-200 whitespace-nowrap ${
-                  filterFavorites 
-                    ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' 
-                    : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
-                }`}
+                className={`px-4 py-3 rounded-lg font-medium transition-colors duration-200 whitespace-nowrap ${filterFavorites
+                  ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                  : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
+                  }`}
               >
                 {filterFavorites ? 'Show All' : 'Favorites Only'}
               </button>
@@ -248,7 +251,7 @@ const ContactsApp = () => {
                 >
                   Previous
                 </button>
-                
+
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   let page: number;
                   if (totalPages <= 5) {
@@ -260,22 +263,21 @@ const ContactsApp = () => {
                   } else {
                     page = currentPage - 2 + i;
                   }
-                  
+
                   return (
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                        currentPage === page
-                          ? 'text-blue-600 bg-blue-50 border border-blue-200'
-                          : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
-                      }`}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg ${currentPage === page
+                        ? 'text-blue-600 bg-blue-50 border border-blue-200'
+                        : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
                     >
                       {page}
                     </button>
                   );
                 })}
-                
+
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}

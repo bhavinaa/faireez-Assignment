@@ -1,4 +1,4 @@
-import { Phone, Heart, Star, Mail } from 'lucide-react';
+import { Phone, Heart, Mail } from 'lucide-react';
 
 export interface Contact {
   id: string;
