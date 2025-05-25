@@ -90,7 +90,6 @@ The Random User API returns different users on each call, making it hard to main
 | GET    | `/contacts`              | Return up to 100 cached contacts |
 | GET    | `/contacts/:id`          | Return contact by ID             |
 | POST   | `/contacts/favorite/:id` | Toggle favorite status (via DTO) |
-| GET    | `/contacts/favorites`    | Return all favorited contacts    |
 
 ---
 
