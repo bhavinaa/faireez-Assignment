@@ -29,25 +29,13 @@ const ContactsApp = () => {
     const loadContacts = async () => {
       try {
         setLoading(true);
-        // Simulate network delay
-        /*  await new Promise(resolve => setTimeout(resolve, 1000));
-          const fakeContacts = generateFakeContacts();
-          const transformedContacts = fakeContacts.map(contact => ({
-            id: String(contact.id),
-            name: `${contact.firstName} ${contact.lastName}`,
-            email: contact.email,
-            phone: contact.phone,
-            picture: contact.avatar,
-            isFavorite: contact.isFavorite
-          }));
-          setContacts(transformedContacts); */
         const response = await fetch('http://localhost:3000/contacts');
         const data = await response.json();
         setContacts(data);
 
         setError(null);
       } catch (err) {
-        setError('Failed to load contacts. Please try again.');
+        setError('Oh no! Something went wrong, unable to find the backend! Our engineers are working on it.');
       } finally {
         setLoading(false);
       }

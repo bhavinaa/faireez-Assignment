@@ -1,173 +1,54 @@
-# faireez-Assignment
-This application allows users to manage their contacts efficiently with a modern and intuitive UI. It fetches contacts from the [RandomUser API](https://randomuser.me/), supports filtering, viewing contact details in a modal, and toggling favorites. It also includes proper error handling and loading states throughout the app.
+# contact application 
+a responsive contact management interface built with react, typescript and tailwind CSS connected to the NestJS backend, with data from the randomuser api
 
----
+## Project Overview
+- view the paginated contacts (simple)
+- search contacts by name
+- sort by name, email, number
+- mark fav
+- view contact + call
 
-## 🧱 Tech Stack
+## Setup Instructions
 
-### Frontend
-- ⚛️ React (TypeScript)
-- 💨 Tailwind CSS
-- 🔄 Axios (API integration)
-- 🧠 Redux 
+Preq
+- nodejs
+- npm
 
-### Backend
-- 🧭 NestJS (TypeScript)
-- 🌐 RESTful API
-- 📦 Axios (to call RandomUser API)
-- 🪵 NestJS Logger
-- ✅ Class-validator (input validation)
-
----
-
-## 🗂️ Project Structure
+### Setup frontend
 
 ```
-
-contacts-app/
-├── frontend/               # React app
-│   ├── src/
-│   │   ├── components/     # UI Components
-│   │   ├── pages/          # Home and modal views
-│   │   ├── services/       # API services
-│   │   ├── store/          # Redux or Context (optional)
-│   │   ├── types/          # TypeScript interfaces
-│   │   └── utils/          # Helpers (debounce, etc.)
-│   └── tailwind.config.js
-├── backend/                # NestJS API
-│   ├── src/
-│   │   ├── contacts/       # Contacts module (controller, service, DTOs)
-│   │   ├── common/         # Shared filters, interceptors
-│   │   └── main.ts
-└── README.md
-
-````
-
----
-
-## 🛠️ Setup Instructions
-
-### 🖥️ Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-````
-
----
-
-### 🧪 Backend
-
-```bash
-cd backend
-npm install
-npm run start:dev
+- cd frontend 
+- npm install 
+- npm start
 ```
+is set to run on port 3001
 
-> API runs at: `http://localhost:3000`
-
-Make sure to configure CORS in `main.ts` of NestJS if needed:
-
-```ts
-app.enableCors({
-  origin: 'http://localhost:5173'
-});
+### Setup backend
 ```
----
+- cd backend
+- npm install
+- npm start
 
-## 🌐 API Documentation
-
-### `GET /contacts`
-
-Fetch a list of 50 random contacts.
-
-**Response:**
-
-```json
-[
-  {
-    "id": "user-123",
-    "name": "John Smith",
-    "email": "john.smith@example.com",
-    "phone": "+1 555-123-4567",
-    "location": "New York, USA",
-    "thumbnail": "https://randomuser.me/api/portraits/men/1.jpg",
-    "isFavorite": false
-  }
-]
 ```
+is set to run on port 3000
 
----
 
-### `GET /contacts/:id`
+### Current UI
 
-Fetch a single contact by ID.
+Default Screen
+![alt text](image.png)
 
----
+Fav only
+![alt text](image-1.png)
 
-### `PATCH /contacts/:id/favorite`
+Selecting a contact
+![alt text](image-3.png)
 
-Toggle favorite status of a contact.
+Calling
+![alt text](image-2.png)
 
-**Request Body:**
+When there are no search results
+![alt text](image-4.png)
 
-```json
-{
-  "isFavorite": true
-}
-```
-
----
-
-## 🎨 UI Features
-
-* ✅ Contact listing with thumbnail, name, and location
-* 🔍 Search bar to filter by name/email
-* 📱 Modal popup with detailed contact view and "Call" simulation
-* 🌟 Favorite/unfavorite toggle
-* 🔁 Loading and error states
-* 📱 Mobile-first responsive design
-
----
-
-## ✨ Bonus Features (If Implemented)
-
-* Pagination for contact list
-* Redux for state management
-* Sorting by name or location
-* Deployed on Vercel / Netlify (frontend) and Render / Heroku (backend)
-
----
-
-## 🧠 Design Decisions
-
-* **Modular folder structure**: Clear separation by feature and domain
-* **API transformation**: Backend transforms RandomUser format into consistent `Contact` DTO
-* **Favorites**: Stored in memory for speed; could be extended to persistent storage
-* **Tailwind CSS**: Used for rapid and responsive UI development
-* **NestJS**: Chosen for its modular, scalable architecture and TypeScript support
-
----
-
-## ✅ Tests (Optional)
-
-### Backend
-
-```bash
-cd backend
-npm run test
-```
-
----
-
-## 📦 Deployment URLs (If Applicable)
-
-* **Frontend**: [https://contacts-frontend.vercel.app](https://contacts-frontend.vercel.app)
-* **Backend**: [https://contacts-api.onrender.com](https://contacts-api.onrender.com)
-
----
-
-## 🧑‍💻 Author
-
-Built for the Faireez Home Assignment – Contacts Application
+unable to connect to the backend
+![alt text](image-5.png)
