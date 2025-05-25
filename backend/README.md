@@ -1,160 +1,237 @@
-# Backend for the contact application
+# Backend for the Contact Application
 
-This would outline any architecutral and design decisions made for the contacts managment backend application. 
+This outlines the **architectural** and **design decisions** made for the contact management backend.
 
-Each decision was made intentionally. I considered factors like 
-* maintainability
-* scalability
-* performance
+Each decision was made intentionally after considering:
 
-I attempted to adhere to the NestJs Best practices, and the clean architecture prinicples.
+- Maintainability  
+- Scalability  
+- Performance  
+
+I aimed to follow **NestJS best practices** and **Clean Architecture** principles.
 
 ---
 
-### Setup + running instructions
-1. clone the repo
-2. cd to the backend folder
+##  Setup & Running Instructions
+
+1. Clone the repo  
+2. Navigate to the backend folder  
+3. Run:
+
+   ```bash
+   npm install
+   npm start
+    ````
+
+The server runs on **port 3000** (hardcoded).
+
+
+## Problem Analysis
+
+The Random User API returns different users on each call, making it hard to maintain a stable contact list or favorites.
+
+###  Solution: Seed-Once Architecture
+
+* Fetch **300 contacts** once on app startup
+* Store them in **in-memory cache** (map)
+* Serve only **100** contacts to the frontend
+
+#### Reasoning:
+
+* Ensures **data consistency** across requests
+* Eliminates repeated external API calls = **better performance**
+* Enables **reliable "favorite" functionality**
+* Reduces dependency on external service availability
+
+#### Trade-offs:
+
+* the data is not persistent. Once you turn it off, it would go away
+
+---
+
+## Design Decisions
+
+### Module Structure
+
+* Single `contacts` module
+* No separate `favorites` module
+
+#### Why?
+
+* **Domain cohesion**: Favorites are a property of a contact
+* No business logic exists outside of a contact
+* Keeping it within one **bounded context** simplifies reasoning (Domain-Driven Design)
+
+#### Alternative Rejected:
+
+* A separate `favorites` module was considered
+* But it seemed to create **artificial separation** without added business value
+
+---
+
+## Two Main Domains
+
+1. `api/`
+
+   * Integrates with **Random User API**
+   * Encapsulates external dependency logic
+
+2. `contacts/`
+
+   * Manages contact data
+   * Handles all business logic: fetching, filtering, marking favorites
+
+---
+
+##  API Endpoints
+
+| Method | Endpoint                 | Description                      |
+| ------ | ------------------------ | -------------------------------- |
+| GET    | `/contacts`              | Return up to 100 cached contacts |
+| GET    | `/contacts/:id`          | Return contact by ID             |
+| POST   | `/contacts/favorite/:id` | Toggle favorite status (via DTO) |
+| GET    | `/contacts/favorites`    | Return all favorited contacts    |
+
+---
+
+## External API Integration
+
+* One-time **fetch at startup**
+* Isolated via a **dedicated service class**
+
+This way, the **business logic is unaware** of external API structure — improving modularity and testability.
+
+---
+
+##  Storage Architecture
+
+### Current:
+
+* **In-memory storage** - key value store (non-persistent)
+
+### Future:
+
+* File-based or relational DB (e.g., PostgreSQL)
+
+####  Design Rationale
+
+* Leverages the **Dependency Inversion Principle**
+  → Business logic depends on **abstracted interfaces**, not concrete storage
+  → Allows easy switching of storage strategies later
+
+---
+
+##  DTOs
+
+* Used for **data validation** using `class-validator`
+* Ensures invalid data doesn’t reach the service layer
+* Each DTO has a **clear purpose**
+
+---
+
+## Controller Layer
+
+Acts as the **entry point** for all HTTP requests.
+
+Responsibilities:
+
+* Validate route params + query strings
+* Call service layer methods
+* Return clean HTTP responses
+
+Implements the 4 core endpoints listed above.
+
+---
+
+##  Service Layer
+
+Holds the **core business logic**.
+
+Key responsibilities:
+
+* Manage in-memory store
+* Enforce correct data types
+* Delegate fetch to `RandomUserService`
+* Filter, sort, and transform data for the frontend
+
+Key methods:
+
+* `getAllContacts()`
+* `getContactById(id)`
+* `updateFavoriteStatus(id, isFavorite)`
+* `getFavoriteContacts()`
+* `getFilteredContacts(query)`
+
+---
+
+##  Random User API Service
+
+Encapsulates logic to interact with [`https://randomuser.me/api/`](https://randomuser.me/api/)
+
+* Fetches **300 users** on demand
+* **Can be mocked** or replaced later if needed
+
+---
+
+## Error Handling
+
+* Handles errors like invalid contact ID gracefully
+* Restricts errors to **inside business logic** where possible
+* Ensures client receives **clear feedback**
+
+---
+
+## Config Layout
+
+* Standard **NestJS folder structure**
+* Feature-based modularization:
+
+  * `api/`
+  * `contacts/`
+
+---
+
+##  Overall Architecture Summary
+
+ - Modular Structure + Dependency Inversion + Domain Encapsulation (external API is isolated) + Clear Separation of Concerns
+
+
+* Controller → Request entry
+* Service → Business logic
+* API Layer → External dependencies
+
+---
+
+## Future Development Considerations
+
+* Migrate to **persistent DB**
+* Support **lazy loading** or paginated fetch from Random User API
+
+---
+
+##  Sequence Diagram
+
+
+<pre>
+```mermaid
+sequenceDiagram
+  participant Frontend
+  participant Controller
+  participant Service
+  participant RandomUserService
+  participant RandomUserAPI
+
+  Frontend->>Controller: GET /contacts
+  Controller->>Service: getAllContacts()
+  Service->>RandomUserService: fetchRandomContacts() (if cache empty)
+  RandomUserService->>RandomUserAPI: GET ?results=300
+  RandomUserAPI-->>RandomUserService: Returns 300 users
+  RandomUserService-->>Service: Parsed Contact[]
+  Service-->>Controller: Contact[]
+  Controller-->>Frontend: Return 100 contacts
 ```
-npm install
-npm start
-```
-
-the server runs on port 3000 (hardcoded)
-### problem analysis
-- managing the contact data from the random user API, where each of the API call returns the different users. This makes it impossible to maintain consistent data for fav
-
-To solve this (attempt 1):
-Seed-Once Architecture
-- load contact data once at the application startup and maintain it in persistent storage
-
-solution
-- fetch 300 contacts once in a startup
-- cache them in the in memory storage
-- serve only 100 to the front end
-
-reasoning:
-- data is consistent. each contant can maintain a stable identity across the requests
-- the performance is better, as it eliminates repeated external API calls
-- the user experience is better, as it enables the reliable favourite functionality
-- it is more reliable as it reduces the dependency on the external service availability
-
-Possible trade offs:
-- while you have predictable data, it might stop you from getting new data
-- while you have a fast response,  it might stop you from having real time updats
-
-
-### Design:
-
-Module structure design
-- have a single contacts module (no fav module)
-
-reason:
-- domain cohesion: we want to store the contacts, and possibly mark them as the fav
-- fav are a property of the contacts, and they are not an independent entity
-- not biz logic exists w/o their parent contact
-- single bound context = single module (following the domain driven design principle)
-
-Alternative considered 
-- a separate fav module. tho rejected it, as it would increase the complexity of it, by creating artificial separation. this would seem to increase complexity without business reason
-
-
-### Two main domains
-1. api/
-* it helps to integrate our backend with the data layer (random user api)
-* helps to encapsulate the external logic
-
-2. contacts/
-* responsible for transforming and manging the contact data
-* helps to handle all the biz logic overall (fetchin, filtering, and favs)
-
-
-### API Design
-
-* GET /contacts = return up to 100 cached contacts
-* GET /contacts/:id = return one contact by ID
-* POST /conatcts/favorite/:id = update fav status (via DTO)
-* GET /contacts/favorites/:id = return the list of all fav contacts
-
-### external api integration
-- service abstraction with single initialisation 
-
-design
-- isolate the external dependency. so the external api call is contained in a dedicated service. the business logic is unaware of the exteranl api strucutre
-
-### Storage Architecture
-
-current: in memory store current
-
-future:
-- file based persistance
-- relational DB
-
-Design rationale
-dep inversion principle
-- biz logic now depends on storage abstraction (there is no concrete implementation)
-- allows you to switch btw storage strategies 
-
-
-### DTO 
-- each DTO has it's purpose. There is input validation at the DTO level using the class validator.
-- the biz rules are enforced before reaching the service layer
-
-
-### Controllder Layer
-Entry point for all HTTP requests
-
-responsiblities
-* validates the route params + query strings
-* calls the appropriate service methods
-* returns the clean HTTP responses
-
-implements the 4 end points
-
-### Service Layer
-Has the core biz logic, it helps to cache and then it serves the data
-- helps to filter, sort the data
-
-Key methods
-- getAllContacts()
-- getContactById(id)
-- updateFavoriteStatus(id, isFavorite)
-- getFavoriteContacts()
-- getFilteredContacts(query)
-
-responsiblities
-- manage the in memory store
-- enfore the data type
-- delegates the fetch to the random user service
-
-### random user API service
-
-- encapsulates the loic to interact with the https://randomuser.me/api/
-- it would fetch the 300 users on demand (hardcoded)
-- can be mocked or swapped for some other api later
-
-### error handling
-- caught errors when the id is wrong,
-- tried to catch and restrict errors found in the app logic within the biz logic 
-
-### config layout
-- uses the standard nestjs project layout
-
-
-### Overall architecutre
-- modular structure (each feature has its own folder)
-* the api and the contacts 
-- dependency inversion (services dont depend on the storage implemnetation)
-
-- domain encapsualtion (external API is isolated from the core logic)
-- separation of concerns (controller, service + integration layer)
-
-
-### Future Dev Considerations
-- move from in memory to DB storage (persistance)
-- fetch contacts page by page from random user API (lazy loading) 
-
-
-### sequence diagram
+</pre>
 
 ![alt text](image.png)
+
 
