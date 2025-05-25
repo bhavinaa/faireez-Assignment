@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, User, Star } from 'lucide-react';
 import ContactCard from './ContactCard';
 import { ContactModal } from './ContactModal';
-import { generateFakeContacts } from '../../data';
+//import { generateFakeContacts } from '../../data';
 
 export interface Contact {
   id: string;
@@ -85,13 +85,39 @@ const ContactsApp = () => {
     setIsModalOpen(false);
   };
 
-  const handleToggleFavorite = (contactId: string): void => {
+  const handleToggleFavorite = (contactId: string, isFavorite: boolean): void => {
     setContacts(prev => prev.map(contact =>
       contact.id === contactId
         ? { ...contact, isFavorite: !contact.isFavorite }
         : contact
     ));
+    const url = `http://localhost:3000/contacts/favorite/${contactId}`;
+    const data = JSON.stringify({ isFavorite });
+    console.log(`Toggling favorite for contact ${contactId}: ${isFavorite}`);
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: data,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          setContacts((prevContacts) => {
+            const updatedContacts = prevContacts.map((contact) => {
+              if (contact.id === contactId) {
+                return { ...contact, isFavorite: !isFavorite };
+              }
+              return contact;
+            });
+            return updatedContacts;
+          });
+        }
+      })
+      .catch((error) => console.error(error));
   };
+
 
   const favoriteCount = contacts.filter(c => c.isFavorite).length;
 
@@ -188,10 +214,10 @@ const ContactsApp = () => {
                   setFilterFavorites(!filterFavorites);
                   setCurrentPage(1);
                 }}
-                className={`px-4 py-3 rounded-lg font-medium transition-colors duration-200 whitespace-nowrap ${filterFavorites
+                className={`px-4 py - 3 rounded - lg font - medium transition - colors duration - 200 whitespace - nowrap ${filterFavorites
                   ? 'bg-yellow-100 text-yellow-800 border border-yellow-200'
                   : 'bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200'
-                  }`}
+                  } `}
               >
                 {filterFavorites ? 'Show All' : 'Favorites Only'}
               </button>
@@ -223,7 +249,7 @@ const ContactsApp = () => {
                     key={contact.id}
                     contact={contact}
                     onClick={handleContactClick}
-                    onToggleFavorite={handleToggleFavorite}
+                    onToggleFavorite={(contactId) => handleToggleFavorite(contactId, !contact?.isFavorite)}
                   />
                 ))}
               </div>
@@ -256,10 +282,10 @@ const ContactsApp = () => {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 text-sm font-medium rounded-lg ${currentPage === page
+                      className={`px - 4 py - 2 text - sm font - medium rounded - lg ${currentPage === page
                         ? 'text-blue-600 bg-blue-50 border border-blue-200'
                         : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-50'
-                        }`}
+                        } `}
                     >
                       {page}
                     </button>
@@ -285,7 +311,7 @@ const ContactsApp = () => {
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onCall={handleCall}
-            onToggleFavorite={handleToggleFavorite}
+            onToggleFavorite={(contactId) => handleToggleFavorite(contactId, !selectedContact.isFavorite)}
           />
         )}
       </div>
