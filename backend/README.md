@@ -156,21 +156,5 @@ responsiblities
 
 ### sequence diagram
 
-<pre><code>```mermaid 
-sequenceDiagram
-  participant Frontend
-  participant Controller
-  participant Service
-  participant RandomUserService
-  participant RandomUserAPI
-
-  Frontend->>Controller: GET /contacts
-  Controller->>Service: getAllContacts()
-  Service->>RandomUserService: fetchRandomContacts() (if empty)
-  RandomUserService->>RandomUserAPI: GET ?results=300
-  RandomUserAPI-->>RandomUserService: returns 300 users
-  RandomUserService-->>Service: parsed Contact[]
-  Service-->>Controller: Contact[]
-  Controller-->>Frontend: 100 contacts
-```</code></pre>
+![alt text](image.png)
 
