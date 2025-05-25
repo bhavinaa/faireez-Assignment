@@ -1,90 +1,108 @@
-## Frontend of the contacts app
 
-This helps to display and manages the list of contcts fetched from an API
+# Frontend of the Contacts App
 
-It supports the features like
-- viewing the cards
-- searching by the name/email
-- sorting by name/email/phone
-- mark/unmark the fav
-- filter the fav
-- simple paging
+This helps to display and manage the list of contacts fetched from an API.
 
-### tech stack
-- react (typescript)
-- tailwind css
-- lucide icons
-- fetch api
+It supports features like:
 
-### components breakdown
+* Viewing the contact cards
+* Searching by name/email
+* Sorting by name/email/phone
+* Marking/unmarking contacts as favorite
+* Filtering favorites
+* Simple pagination
 
-#### ContactsApp.tsx
-- main logic and layout of the contact list interface
+---
 
-Key responsibilites
-- Parent compontent that helps with the state maangement for the contacts, filters, and UI
-- loads the data from the backend
-- renders the layout section (stats, filters, contacts, pagination)
-- passes the data to child
+### Tech Stack
 
-Props: none (self-contained)
-State: contacts, searchTerm, isModalOpen, selectedContact, etc.
+* React (TypeScript)
+* Tailwind CSS
+* Lucide Icons
+* Fetch API
 
-#### contact card.tsx
-- displays the indiviudal contact (reusable)
+---
 
-Props
-- contact (contact object)
-- on click (open modal)
-- on toggle fav (fav status)
+### Components Breakdown
 
-#### ContactModal.tsx
-Modal popup for viewing contact details and calling.
+#### `ContactsApp.tsx`
 
-Props:
-contact: Selected contact object
-isOpen: Boolean to control visibility
-onClose: Close modal
-onCall: Simulate call
-onToggleFavorite: Toggle favorite status
+Main logic and layout of the contact list interface.
 
-#### Tailwind styling
-- Layout: grid, flex, gap, justify-between
-- Typography: text-gray-700, font-bold
-- Spacing: p-4, px-6, mb-8
-- Responsiveness: sm:, lg:, xl:
-- Interactivity: hover:bg-gray-100, focus:ring-2
-- Reusability
+**Key responsibilities:**
+
+* Parent component handling state management for contacts, filters, and UI
+* Loads the data from the backend
+* Renders layout sections: stats, filters, contacts, pagination
+* Passes data to children
+
+**Props:** None (self-contained)
+**State:** `contacts`, `searchTerm`, `isModalOpen`, `selectedContact`, etc.
+
+---
+
+#### `ContactCard.tsx`
+
+Displays an individual contact card (reusable).
+
+**Props:**
+
+* `contact`: Contact object
+* `onClick`: Opens modal
+* `onToggleFavorite`: Toggles favorite status
+
+---
+
+#### `ContactModal.tsx`
+
+Modal popup for viewing contact details and simulating a call.
+
+**Props:**
+
+* `contact`: Selected contact object
+* `isOpen`: Boolean to control visibility
+* `onClose`: Close modal
+* `onCall`: Simulate a call
+* `onToggleFavorite`: Toggle favorite status
+
+---
+
+### Tailwind Styling
+
+* **Layout:** `grid`, `flex`, `gap`, `justify-between`
+* **Typography:** `text-gray-700`, `font-bold`
+* **Spacing:** `p-4`, `px-6`, `mb-8`
+* **Responsiveness:** `sm:`, `lg:`, `xl:`
+* **Interactivity:** `hover:bg-gray-100`, `focus:ring-2`
+* **Reusability:** Utility-first approach
+
+---
+
+### UI Considerations
+
+* Clean layout and visual hierarchy
+* Responsive grid for optimal screen space
+* Hover/focus interactions
+* Center-aligned accessible modals
+
+---
+
+###  Sequence Diagram
+
+![image](https://github.com/user-attachments/assets/effdabb3-49f5-4b69-98eb-f6fd0ce4aa83)
 
 
-### UI considerations
-- layout 
-- cards 
-- responsive grid (for optimal usage of the screen space)
-- interaction (hoverv, focus)
-- modals (accessible + center aligned when it pops up)
+---
 
+###  API Endpoint
 
-### Data Flow
-User Visits App 
-↓
-[App Load]
-↓
-useEffect → fetch API → setContacts
-↓
-State: contacts[] → filteredAndSortedContacts[]
-↓
-Render:
-- Stats Section (uses counts)
-- Filter Bar (searchTerm, sortBy, filterFavorites)
-- Grid → ContactCard[]
-- Modal (selectedContact)
-
-###  API endpoint
-- GET http://localhost:3000/contacts
-- Expects a JSON array of contacts.
-- Each contact should have:
 ```
+GET http://localhost:3000/contacts
+```
+
+**Response Format:**
+
+```ts
 interface Contact {
   id: string;
   name: string;
@@ -95,42 +113,123 @@ interface Contact {
 }
 ```
 
-### App Logic
+---
+
+###  App Logic
 
 #### Search Logic
+
+```ts
 contacts.filter(c =>
   `${c.name} ${c.email}`.toLowerCase().includes(searchTerm.toLowerCase())
 )
-#### Sort Logic
+```
+
+####  Sort Logic
+
+```ts
 filtered.sort((a, b) => a.name.localeCompare(b.name))
+```
 
-#### Fav Logic
+#### Favorite Filter Logic
+
+```ts
 filterFavorites ? contacts.filter(c => c.isFavorite) : contacts
+```
 
-### Future improvements
-- add animations
-- local storage sync for fav
+---
+
+### Future Improvements
+
+* Add animations and transitions
+* Sync favorite status with local storage
+
+---
+
+### React Design Patterns Used
+
+* **Functional Components** (no class components)
+* **React Hooks**
+
+  * `useState` for local and UI state
+  * `useEffect` for data fetching (side-effects)
+* **Single Responsibility Principle**
+
+  * `ContactCard` and `ContactModal` 
+* **Presentational vs Container Components**
+
+  * Logic in parent (`ContactsApp`), view-only children
+* **No Redux**
+
+  * Simple state, shallow component tree → prop drilling is manageable
+* **Conditional Rendering**
+
+  ```tsx
+  {selectedContact && <ContactModal ... />}
+  ```
+* **Separation of State and Derived Data**
+
+  * UI state is distinct from filtered/sorted data
+* **TypeScript**
+
+  * Interfaces used for type safety
+
+---
+
+##  Design Decisions (Frontend)
+
+### 1. **Component Architecture**
+
+*  **Single Responsibility Principle**
+  Each component does one thing well:
+
+  * `ContactsApp` manages state and logic
+  * `ContactCard` displays one contact
+  * `ContactModal` handles UI for details
+### 2. **UI Library: Tailwind CSS**
+
+*  Rapid prototyping and consistent styling
+  * Eliminated need for writing custom CSS classes
+  * Used by faireez too
+
+* **Design Consideration:**
+
+  * Tailwind scales well with component-based frameworks
+  * Responsiveness is handled using built-in breakpoints
+
+### 3. **Icons: Lucide**
+
+* Lightweight icon set
+  and has better integration with React than alternatives like FontAwesome
+
+### 4. **Data Fetching: `fetch()` API inside `useEffect()`**
+
+* Ensures the data loads only once when the app mounts
+  Simple and avoids external libraries (e.g., Axios)
+
+* **Alternative Considered:** Axios 
+  *  `fetch` is enough for a single GET request
+
+### 5. **State Management Strategy**
+
+*  Local state using `useState`
+
+  * `contacts`, `searchTerm`, `sortBy`, `filterFavorites`, etc. all kept in `ContactsApp`
+
+*   `filteredAndSortedContacts` is calculated via chaining filters and sorters instead of storing extra states
 
 
-### react design patterns
+  * No use of reducers or context since the state logic is straightforward and app size is small
 
-- react functional comp (no classes)
-- react hooks 
-* use state (for local state + UI)
-* use effect (side effects as i fetch the API to mount)
-- single responsibility components (for the contact card, and the contact modal)
-* receives props
-* manages no internal state (statless)
-- presentational vs container component pattern
+### 6. **UI Responsiveness & Accessibility**
+
+*  Used Tailwind’s responsive utilities (`sm:`, `md:`, `xl:`)
+*  Modal is centered and focus-aware
+*  Contact cards adapt to screen size using `grid-cols-*` utilities
+
+### 7. **Performance Considerations**
+
+*  Fetch data once → in-memory caching on frontend
+*  Only display 100 contacts out of 300 fetched for performance
 
 
-Did not use redux (no complex state managment)
-- currently using props to pass from the parent to the children (very small app)
-- the prop drilling is easy to follow, and the tree is shallow
-
-- conditional rendering
-{selectedContact && <ContactModal ... />}
-
-- component state sep
-* curr ui state is kept separate from the derived data 
-- typescript has an interface 
