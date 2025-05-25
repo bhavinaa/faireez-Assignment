@@ -156,6 +156,7 @@ responsiblities
 
 ### sequence diagram
 
+<pre><code>```mermaid 
 sequenceDiagram
   participant Frontend
   participant Controller
@@ -171,3 +172,5 @@ sequenceDiagram
   RandomUserService-->>Service: parsed Contact[]
   Service-->>Controller: Contact[]
   Controller-->>Frontend: 100 contacts
+```</code></pre>
+
