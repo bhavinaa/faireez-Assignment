@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, OnModuleInit, NotFoundException, Logger, InternalServerErrorException } from '@nestjs/common';
 import { RandomUserService } from '../api/random-user.service';
 import { Contact } from './contacts.interface';
 import { ContactQueryDTO } from './dto/query.dto';
@@ -12,8 +12,13 @@ export class ContactsService implements OnModuleInit {
   constructor(private readonly randomUser: RandomUserService) {}
 
   async onModuleInit() {
+    try {
     this.logger.log(`Initializing with up to ${this.MAX} contacts`);
     this.contacts = await this.randomUser.fetchRandomContacts(this.MAX);
+    } catch (error) {
+      this.logger.error('Failed to fetch initial contacts', error);
+      throw new InternalServerErrorException('Could not initialize contact list');
+    }
   }
 
   async getAllContacts(): Promise<Contact[]> {
